@@ -1,1 +1,8 @@
 .venv/
+hello_cuda/cuda_hello
+hello_cuda/cuda_hello.o
+hello_cuda/cuda_hello1
+hello_cuda/cuda_hello1.o
+hello_cuda/cuda-repo-wsl-ubuntu-13-2-local_13.2.0-1_amd64.deb
+hello_cuda/deviceQuery
+hello_cuda/deviceQuery.o

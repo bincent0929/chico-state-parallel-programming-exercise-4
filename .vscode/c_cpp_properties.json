@@ -5,9 +5,10 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/lib/x86_64-linux-gnu/openmpi/include",
-                "/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi"
+                "/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi",
+                "/usr/local/cuda/include"
             ],
-            "defines": [],
+            "defines": ["__global__="],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",

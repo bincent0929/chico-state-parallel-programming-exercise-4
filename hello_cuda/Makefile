@@ -61,7 +61,7 @@ DARWIN = $(strip $(findstring DARWIN, $(OSUPPER)))
 # /usr/local/cuda-13.0/bin/nvcc
 #CUDA_PATH       ?= /usr
 #CUDA_PATH       ?= /usr/local/cuda-13.0
-CUDA_PATH       ?= /usr/local/cuda-12.9
+CUDA_PATH       ?= /usr/local/cuda
 CUDA_INC_PATH   ?= /usr/include
 CUDA_SAMP_PATH	?= ../cuda_common
 CUDA_BIN_PATH   ?= $(CUDA_PATH)/bin
