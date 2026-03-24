@@ -70,14 +70,23 @@ __global__ void Dev_trap(
       const float  h       /* in     */, 
       const int    n       /* in     */, 
       float*       trap_p  /* in/out */) {
+   // This is the rank of the thread
    int my_i = blockDim.x * blockIdx.x + threadIdx.x;
+   /**
+    * this is the number of threads in the grid
+    * threads in the block * blocks in the grid
+    *  */
+   int stride = blockDim.x * gridDim.x;
 
    /* f(x_0) and f(x_n) were computed on the host.  So */
    /* compute f(x_1), f(x_2), ..., f(x_(n-1))          */
-   if (0 < my_i && my_i < n) {
-      float my_x = a + my_i*h;
-      float my_trap = f(my_x);
-      atomicAdd(trap_p, my_trap);
+
+   for (; my_i < n; my_i += stride) {
+      if (my_i > 0) {
+            float my_x = a + my_i*h;
+            float my_trap = f(my_x);
+            atomicAdd(trap_p, my_trap);
+      }
    }
 }  /* Dev_trap */    
 
@@ -162,7 +171,7 @@ int main(int argc, char* argv[]) {
  *            number or there aren't enough threads, print a message 
  *            and quit.
  */
-void Get_arg(const int argc, char* argv[], int* n_p) {
+void Get_args(const int argc, char* argv[], int* n_p) {
 
    if (argc != 2) {
       fprintf(stderr, "usage: %s <n>\n", 
