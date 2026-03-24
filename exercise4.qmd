@@ -5,6 +5,8 @@ format:
     self-contained: true
     embed-resources: true
 jupyter: python3
+execute:
+  keep-ipynb: false
 ---
 
 ::: {.callout-note}
@@ -38,8 +40,8 @@ Tue Mar 24 15:45:36 2026
 ## 1. 
 
 ### a.
-- It looks like for `cuda_hello.cu` the maximum amount of threads that can print is 1024. Which is the amount of threads that can be on one block for my GPU.
-  - For `cuda_hello1.cu` the max amount of threads that can print hello is 864 * 1024. Which 864 being how many blocks there are on the GPU and 1024 being how many threads there are on each block.
+- It looks like for `cuda_hello.cu` the maximum amount of threads that can print is $1024$. Which is the amount of threads that can be on one block for my GPU.
+  - For `cuda_hello1.cu` the max amount of threads that can print hello is $864 * 1024$. Which $864$ being how many blocks there are on the GPU and $1024$ being how many threads there are on each block.
   - "Can you use bigger blocks and threads"
     - Well, in my case, for my GPU, I would not be able to scale any more than I have. But, if I had access to more hardware, the program would be able to scale by increasing the block size and threads used for each of those blocks up to however many the hardware could provide. Obviously if you're using multiple hosts you would need to also use MPI.
 
@@ -60,7 +62,7 @@ It looks like the Device ended up taking long on average than the host for the c
 
 #### Correctness
 
-They did get approxemately 2.0 when `a = 0` and `b = pi`.
+They did get approxemately $2.0$ when $a = 0$ and $b = pi$.
 
 #### Command Line Argument Explanation
 
@@ -122,7 +124,8 @@ fig.add_trace(go.Scatter(
     y=interpolated,
     mode='lines',
     name=f'Interpolated ({steps_per_sec} samples/sec)',
-    line=dict(color='royalblue', width=1.5),
+    line=dict(color='royalblue', width=10.0),
+    opacity=0.85,
 ))
 
 fig.add_trace(go.Scatter(
@@ -137,7 +140,7 @@ fig.update_layout(
     title='Acceleration Profile: Interpolated vs Original 1-Second Data',
     xaxis_title='Time (seconds)',
     yaxis_title='Acceleration',
-    legend=dict(x=0.01, y=0.99),
+    legend=dict(x=0.5, y=1.1, xanchor='center', yanchor='bottom', orientation='h'),
     hovermode='x unified',
 )
 
