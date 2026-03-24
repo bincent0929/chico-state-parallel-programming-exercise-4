@@ -8,7 +8,7 @@
                 "/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi",
                 "/usr/local/cuda/include"
             ],
-            "defines": ["__global__="],
+            "defines": ["__global__=", "_GNU_SOURCE"],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
