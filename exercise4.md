@@ -40,3 +40,18 @@ They did get approxemately 2.0 when `a = 0` and `b = pi`.
 - `th_per_blk`
   - The amount of threads that will be run on each block
 
+#### Program Simplification
+
+Look at `cuda_trap1.cu` and compile it for yourself inputting the amount of trapezoids in as the first and only argument in the command line.
+
+The output should look like this:
+```c
+$ ./cuda_trap1 1000000
+The area as computed by cuda is: 2.000982e+00
+The area as computed by cpu is: 2.001454e+00
+Device times:  min = 6.419001e-01, max = 7.105761e-01, avg = 6.882100e-01
+  Host times:  min = 4.268169e-03, max = 5.291939e-03, avg = 4.500465e-03
+```
+
+As you can see, even with the change in arugments required and slight refactor to enable 1 million+ trapezoid processing, the Device is still slower than a single core on the host.
+

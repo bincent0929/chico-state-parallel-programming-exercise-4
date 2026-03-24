@@ -80,7 +80,16 @@ __global__ void Dev_trap(
 
    /* f(x_0) and f(x_n) were computed on the host.  So */
    /* compute f(x_1), f(x_2), ..., f(x_(n-1))          */
-
+   
+   /**
+    * The stride is used here sets it up so that
+    * each thread strides forward instead of only
+    * calculating its own singular index.
+    * For example, Thread 0 could do my_i = 0
+    * and then if stride = 201 then it would also do
+    * my_i = 201, and on until all the indeces's
+    * tradezoid has been processed.
+    */
    for (; my_i < n; my_i += stride) {
       if (my_i > 0) {
             float my_x = a + my_i*h;
