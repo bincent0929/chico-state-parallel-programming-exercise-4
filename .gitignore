@@ -19,3 +19,11 @@ cuda-integrators/cuda_trap3b
 cuda-integrators/cuda_trap3b.o
 cuda-integrators/trap
 cuda-integrators/trap.o
+functiongen/csvtostatic
+functiongen/csvtostatic.o
+functiongen/timeinterp
+functiongen/timeinterp.o
+functiongen/timeprofiles
+functiongen/timeprofiles_omp
+functiongen/timeprofiles.o
+functiongen/interop-output-10ps.csv

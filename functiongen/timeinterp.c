@@ -68,7 +68,8 @@ void main(int argc, char *argv[])
     {
         // time you would use in your integrator and faccel(time) is the fuction to integrate
         time = 0.0 + (dt*(double)idx);
-        printf("%015.14lf, %015.14lf\n", time, faccel(time));
+        //printf("%015.14lf, %015.14lf\n", time, faccel(time));
+        printf("%016.15lf\n", faccel(time));
     }
 
 }
