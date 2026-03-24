@@ -32,6 +32,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "timer.h"
 
 #ifndef SAVE_STATS
@@ -84,9 +85,7 @@ __global__ void Dev_trap(
 /*-------------------------------------------------------------------
  * Host code 
  */
-void  Get_args(const int argc, char* argv[], int* n_p, 
-      float* a_p, float* b_p,
-      int* blk_ct, int* th_per_blk_p);
+void  Get_args(const int argc, char* argv[], int* n_p);
 void  Trap_wrapper(const float a, const float b, const int n, 
       float* trap_p, const int blk_ct, const int th_per_blk);
 float Serial_trap(const float a, const float b, const int n);
@@ -103,9 +102,18 @@ int main(int argc, char* argv[]) {
    double dmin = 1.0e6, dmax = 0.0, dtotal = 0.0;
    double hmin = 1.0e6, hmax = 0.0, htotal = 0.0;
    cudaError_t err;
+   cudaDeviceProp prop;
+
+   cudaGetDeviceProperties(&prop, 0);
+
+   blk_ct = prop.maxBlocksPerMultiProcessor * prop.multiProcessorCount;
+   th_per_blk = prop.maxBlocksPerMultiProcessor;
+
+   a = 0;
+   b = M_PI;
 
 
-   Get_args(argc, argv, &n, &a, &b, &blk_ct, &th_per_blk);
+   Get_args(argc, argv, &n);
    err = cudaMallocManaged(&trap_p, sizeof(float));
    if (err != cudaSuccess) {
       fprintf(stderr, "cudaMallocManaged error = %s\n", 
@@ -154,25 +162,15 @@ int main(int argc, char* argv[]) {
  *            number or there aren't enough threads, print a message 
  *            and quit.
  */
-void Get_args(const int argc, char* argv[], int* n_p, 
-      float* a_p, float* b_p, 
-      int* blk_ct_p, int* th_per_blk_p) {
+void Get_arg(const int argc, char* argv[], int* n_p) {
 
-   if (argc != 6) {
-      fprintf(stderr, "usage: %s <n> <a> <b> <blk_ct> <th_per_blk>\n", 
+   if (argc != 2) {
+      fprintf(stderr, "usage: %s <n>\n", 
             argv[0]);
       exit(0);
    }
    *n_p = strtol(argv[1], NULL, 10);
-   *a_p = strtod(argv[2], NULL);
-   *b_p = strtod(argv[3], NULL);
-   *blk_ct_p = strtol(argv[4], NULL, 10);
-   *th_per_blk_p = strtol(argv[5], NULL, 10);
-   if (*n_p > (*blk_ct_p)*(*th_per_blk_p)) {
-      fprintf(stderr, "Number of threads must be >= n\n");
-      exit(0);
-   }
-}  /* Get_args */
+}  /* Get_arg */
 
 
 /*-------------------------------------------------------------------
