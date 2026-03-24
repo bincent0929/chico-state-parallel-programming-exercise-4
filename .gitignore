@@ -27,3 +27,7 @@ functiongen/timeprofiles
 functiongen/timeprofiles_omp
 functiongen/timeprofiles.o
 functiongen/interop-output-10ps.csv
+exercise4.html
+exercise4.quarto_ipynb_1
+exercise4.quarto_ipynb_2
+exercise4.quarto_ipynb_3
