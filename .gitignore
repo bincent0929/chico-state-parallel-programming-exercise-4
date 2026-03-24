@@ -7,3 +7,15 @@ hello_cuda/cuda-repo-wsl-ubuntu-13-2-local_13.2.0-1_amd64.deb
 hello_cuda/deviceQuery
 hello_cuda/deviceQuery.o
 gpu-specs-check
+cuda-integrators/cuda_trap1
+cuda-integrators/cuda_trap1.o
+cuda-integrators/cuda_trap2
+cuda-integrators/cuda_trap2.o
+cuda-integrators/cuda_trap2b
+cuda-integrators/cuda_trap2b.o
+cuda-integrators/cuda_trap3
+cuda-integrators/cuda_trap3.o
+cuda-integrators/cuda_trap3b
+cuda-integrators/cuda_trap3b.o
+cuda-integrators/trap
+cuda-integrators/trap.o

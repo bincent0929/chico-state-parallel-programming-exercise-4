@@ -60,7 +60,7 @@ DARWIN = $(strip $(findstring DARWIN, $(OSUPPER)))
 # Location of the CUDA Toolkit binaries and libraries on cscigpu
 #CUDA_PATH       ?= /usr
 #CUDA_PATH       ?= /usr/local/cuda-13.0
-CUDA_PATH       ?= /usr/local/cuda-12.9
+CUDA_PATH       ?= /usr/local/cuda
 CUDA_INC_PATH   ?= /usr/include
 CUDA_BIN_PATH   ?= $(CUDA_PATH)/bin
 CUDA_LIB_PATH   ?= $(CUDA_PATH)/lib64
