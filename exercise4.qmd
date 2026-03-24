@@ -1,0 +1,136 @@
+::: {.callout-note}
+Here's the output for the specs Device and software I'm using:
+```sh
+$ nvidia-smi
+Tue Mar 24 15:45:36 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.54                 Driver Version: 595.79         CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 4070 ...    On  |   00000000:01:00.0 Off |                  N/A |
+| N/A   39C    P0             16W /  105W |      69MiB /   8188MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+```
+:::
+
+
+## 1. 
+
+### a.
+- It looks like for `cuda_hello.cu` the maximum amount of threads that can print is 1024. Which is the amount of threads that can be on one block for my GPU.
+  - For `cuda_hello1.cu` the max amount of threads that can print hello is 864 * 1024. Which 864 being how many blocks there are on the GPU and 1024 being how many threads there are on each block.
+  - "Can you use bigger blocks and threads"
+    - Well, in my case, for my GPU, I would not be able to scale any more than I have. But, if I had access to more hardware, the program would be able to scale by increasing the block size and threads used for each of those blocks up to however many the hardware could provide. Obviously if you're using multiple hosts you would need to also use MPI.
+
+### b. 
+I built the `cuda_trap1.cu` program and using nearly the maximum available values I could put for `n` and the block count and threads per block, these are my results:
+
+```c
+$ ./cuda_trap1 884000 0 3.14159265358979323846264338327950288 864 1024
+The area as computed by cuda is: 2.000657e+00
+The area as computed by cpu is: 2.000605e+00
+Device times:  min = 5.952981e-01, max = 6.454661e-01, avg = 6.299590e-01
+  Host times:  min = 3.762007e-03, max = 5.332947e-03, avg = 3.930178e-03
+```
+
+#### Comparison
+
+It looks like the Device ended up taking long on average than the host for the calculation.
+
+#### Correctness
+
+They did get approxemately 2.0 when `a = 0` and `b = pi`.
+
+#### Command Line Argument Explanation
+
+- `n`
+  - The amount of trapezoids to use
+- `a`
+  - The start index for the function
+- `b`
+  - The end index for the function
+- `blk_ct`
+  - The amount of blocks to be used on the Device
+- `th_per_blk`
+  - The amount of threads that will be run on each block
+
+#### Program Simplification
+
+Look at `cuda_trap1.cu` and compile it for yourself inputting the amount of trapezoids in as the first and only argument in the command line.
+
+The output should look like this:
+```c
+$ ./cuda_trap1 1000000
+The area as computed by cuda is: 2.000982e+00
+The area as computed by cpu is: 2.001454e+00
+Device times:  min = 6.419001e-01, max = 7.105761e-01, avg = 6.882100e-01
+  Host times:  min = 4.268169e-03, max = 5.291939e-03, avg = 4.500465e-03
+```
+
+As you can see, even with the change in arugments required and slight refactor to enable 1 million+ trapezoid processing, the Device is still slower than a single core on the host.
+
+## 2. 
+
+``` {python}
+import plotly.graph_objects as go
+import csv
+
+def load_single_column_csv(path):
+    values = []
+    with open(path, newline='') as f:
+        for row in csv.reader(f):
+            if row:
+                values.append(float(row[0]))
+    return values
+
+original = load_single_column_csv("functiongen/Ex4-Acceleration-Profile.csv")
+interpolated = load_single_column_csv("functiongen/interop-output-10ps.csv")
+
+# Original data is 1 sample/sec: t = 0, 1, 2, ..., 1800
+orig_time = [float(i) for i in range(len(original))]
+
+# Interpolated data is 10 samples/sec: t = 0, 0.1, 0.2, ..., 1800
+steps_per_sec = (len(interpolated) - 1) // (len(original) - 1)
+dt = 1.0 / steps_per_sec
+interp_time = [i * dt for i in range(len(interpolated))]
+
+fig = go.Figure()
+
+fig.add_trace(go.Scatter(
+    x=interp_time,
+    y=interpolated,
+    mode='lines',
+    name=f'Interpolated ({steps_per_sec} samples/sec)',
+    line=dict(color='royalblue', width=1.5),
+))
+
+fig.add_trace(go.Scatter(
+    x=orig_time,
+    y=original,
+    mode='markers',
+    name='Original (1 sample/sec)',
+    marker=dict(color='red', size=4, symbol='circle'),
+))
+
+fig.update_layout(
+    title='Acceleration Profile: Interpolated vs Original 1-Second Data',
+    xaxis_title='Time (seconds)',
+    yaxis_title='Acceleration',
+    legend=dict(x=0.01, y=0.99),
+    hovermode='x unified',
+)
+
+fig.show()
+```
