@@ -25,6 +25,9 @@
 #include <string.h>
 #include <mpi.h>
 #include <unistd.h>
+#include <omp.h>
+
+#include <interpolation_functions.h>
 
 #define DEBUG_TRACE
 #define DEBUG_STEP (100)
@@ -147,6 +150,7 @@ int main(void)
             //
             // Good candidate for OpenMP parallel loop for MPI+OpenMP
             //
+            // #pragma
             for(idx = q*subrange; idx < (q*subrange)+subrange; idx++)
                 default_sum[idx] += default_sum[((q-1)*subrange)+subrange-1];
         }
