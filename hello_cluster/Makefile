@@ -10,10 +10,10 @@ CFLAGS= -g -Wall $(INCLUDE_DIRS) $(CDEFS)
 HYBRID_CFLAGS= -fopenmp -g -Wall $(INCLUDE_DIRS) $(CDEFS)
 LIBS=
 
-PRODUCT= greetings greetingscpp ranksum ranksumfan ranksumtree ranksumbutterfly ranksumall ranksumreduce ranksumallreduce rankmulallreduce rankscattergather piseriesreduce piseriessimp compare hybridcompare chatgpttrain chatgptseqtrain mpi_array rankmul
+PRODUCT= greetings greetingscpp ranksum ranksumfan ranksumtree ranksumbutterfly ranksumall ranksumreduce ranksumallreduce rankmulallreduce rankscattergather piseriesreduce piseriessimp compare hybridcompare chatgpttrain chatgptseqtrain mpi_array rankmul mpi_train
 
 HFILES= 
-CFILES= greetings.c ranksum.c ranksumfan.c ranksumtree.c ranksumbutterfly.c ranksumall.c ranksumreduce.c ranksumallreduce.c rankmulallreduce.c rankscattergather.c piseriesreduce.c piseriessimp.c compare.c hybridcompare.c chatgpttrain.c chatgptseqtrain.c mpi_array.c rankmul.c
+CFILES= greetings.c ranksum.c ranksumfan.c ranksumtree.c ranksumbutterfly.c ranksumall.c ranksumreduce.c ranksumallreduce.c rankmulallreduce.c rankscattergather.c piseriesreduce.c piseriessimp.c compare.c hybridcompare.c chatgpttrain.c chatgptseqtrain.c mpi_array.c rankmul.c mpi_train.c
 
 SRCS= ${HFILES} ${CFILES}
 OBJS= ${CFILES:.c=.o}
@@ -80,3 +80,6 @@ chatgpttrain:	chatgpttrain.c ex4.h
 
 chatgptseqtrain:	chatgptseqtrain.c ex4.h
 	$(GCC) $(CFLAGS) -o $@ chatgptseqtrain.c $(LIB_DIRS)
+
+mpi_train:	mpi_train.c trap.h sine.h
+	$(CC) $(CFLAGS) -o $@ mpi_train.c $(LIB_DIRS)
