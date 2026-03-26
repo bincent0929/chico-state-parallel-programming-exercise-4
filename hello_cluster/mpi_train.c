@@ -52,11 +52,14 @@ int main(void)
 
     // Parallel summing example
     double local_sum=0.0, g_sum=0.0;
-    double default_sum[sizeof(DefaultProfile)/sizeof(double)];
-    double default_sum_of_sums[sizeof(DefaultProfile)/sizeof(double)];
     int tablelen = sizeof(DefaultProfile)/sizeof(double);
+    double default_sum[tablelen];
+    double default_sum_of_sums[tablelen];
     int subrange;
     //int residual;
+
+    double dt = 0.001;
+    double total_time = tablelen - 1;
 
     // Fill in default_sum array used to simulate a new table of values, such as
     // a velocity table derived by integrating acceleration
@@ -72,8 +75,13 @@ int main(void)
     MPI_Init(NULL, NULL);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
+    
+    // this is the range of table values a rank processes to
     subrange = tablelen / comm_sz;
+    // this is the range of times the rank processes
+    double subrange_time = total_time / comm_sz;
+    // I'm not sure about this steps_per_rank
+    long steps_per_rank = (long)(1.0 / dt);
 
     // For train, residual is one, but this is really just the first/last time index.
     // In general, this extra work would be handled by the last rank for simplicity, but
@@ -95,12 +103,20 @@ int main(void)
         gethostname(hostname, MAX_STRING);
         MPI_Get_processor_name(nodename, &namelen);
 
+        double t_start = my_rank * subrange_time;
+        double vel = 0.0;
+        int table_idx = my_rank * subrange;
         // Now sum up the values in the LUT function
-        for(idx = my_rank*subrange; idx < (my_rank*subrange)+subrange; idx++)
-        {
-            local_sum += DefaultProfile[idx];
-            default_sum[idx] = local_sum; // Each rank has it's own subset of the data
+        for (long i = 0; i < (long)(subrange_time / dt); i++) {
+            double t = t_start + i * dt;
+            vel += faccel(t) * dt;
+
+            if ((i + 1) % steps_per_rank == 0) {
+                default_sum[table_idx] = vel;
+                table_idx++;
+            }
         }
+        local_sum = vel;
 
         sprintf(resultmsg, "Sum of DefaultProfile for rank %d of %d on %s is %lf", my_rank, comm_sz, nodename, local_sum);
         MPI_Send(resultmsg, strlen(resultmsg)+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
