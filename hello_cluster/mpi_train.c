@@ -212,13 +212,8 @@ int main(void)
     // as the original accel(t) table with 1801 data points for time=0, ..., 1800.
     //
 
-    /**
-     * This copies the calculated velocity values from the first parallel phase
-     * to the VelProfile that's.
-     * 
-     * I could probably avoid having to do this by just having fvel()
-     * take in 
-     */
+    // this is basically the same value of tablelen but as a
+    // different type.
     long unsigned int tsize = sizeof(default_sum) / sizeof(double);
 
     local_sum=0;
@@ -226,20 +221,36 @@ int main(void)
     if(my_rank != 0)
     {
         // Now sum up the values in the new LUT function default_sum
-        for(idx = my_rank*subrange; idx < (my_rank*subrange)+subrange; idx++)
-        {
-            local_sum += default_sum[idx];
-            default_sum_of_sums[idx] = local_sum; // Each rank has it's own subset of the data
+        double t_start = my_rank * subrange_time;
+        double dist = 0.0;
+        int table_idx = my_rank * subrange;
+        for (long i = 0; i < (long)(steps_per_rank); i++) {
+            double t = t_start + i * dt;
+            // default_sum == VelProfile
+            dist += fvel(t, &default_sum, &tsize) * dt;
+            if ((i + 1) % steps_per_second == 0) {
+                default_sum_of_sums[table_idx] = dist;
+                table_idx++;
+            }
         }
+        local_sum = dist;
     }
     else
     {
         // Now sum up the values in the new LUT function default_sum
-        for(idx = 0; idx < subrange; idx++)
-        {
-            local_sum += default_sum[idx];
-            default_sum_of_sums[idx] = local_sum; // Each rank has it's own subset of the data
+        double t_start = my_rank * subrange_time;
+        double dist = 0.0;
+        int table_idx = my_rank * subrange;
+        for (long i = 0; i < (long)(steps_per_rank); i++) {
+            double t = t_start + i * dt;
+            // default_sum == VelProfile
+            dist += fvel(t, &default_sum, &tsize) * dt;
+            if ((i + 1) % steps_per_second == 0) {
+                default_sum_of_sums[table_idx] = dist;
+                table_idx++;
+            }
         }
+        local_sum = dist;
     }
 
     // This should be the summation of the sums, which should match the spreadsheet for a train profile for dt=1.0
