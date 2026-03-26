@@ -14,17 +14,15 @@ double table_accel(int timeidx)
     return DefaultProfile[timeidx];
 }
 
-double table_vel(int timeidx)
+double table_vel(int timeidx, double (*VelProfile[]), long unsigned int* tsize)
 {
-    long unsigned int tsize = sizeof(VelProfile) / sizeof(double);
-
     if(timeidx > tsize)
     {
         printf("timeidx=%d exceeds table size = %lu and range %d to %lu\n", timeidx, tsize, 0, tsize-1);
         exit(-1);
     }
 
-    return VelProfile[timeidx];
+    return (*VelProfile)[timeidx];
 }
 
 double faccel(double time)
@@ -64,11 +62,11 @@ double faccel(double time)
            );
 }
 
-double fvel(double time)
+double fvel(double time, double (*VelProfile[]), long unsigned int* tsize)
 {
     int timeidx = (int)time;
     int timeidx_next = ((int)time)+1;
     double delta_t = time - (double)((int)time);
 
-    return (table_vel(timeidx) + ( (table_vel(timeidx_next) - table_vel(timeidx)) * delta_t) );
+    return (table_vel(timeidx, (*VelProfile), tsize) + ( (table_vel(timeidx_next, VelProfile, tsize) - table_vel(timeidx, VelProfile, tsize)) * delta_t) );
 }

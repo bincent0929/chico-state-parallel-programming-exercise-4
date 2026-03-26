@@ -80,8 +80,11 @@ int main(void)
     subrange = tablelen / comm_sz;
     // this is the range of times the rank processes
     double subrange_time = total_time / comm_sz;
-    // I'm not sure about this steps_per_rank
-    long steps_per_rank = (long)(1.0 / dt);
+    // this is how many steps each second is divide into
+    long steps_per_second = (long)(1.0 / dt);
+    // this is how many steps the rank will go through
+    long steps_per_rank = (long)(subrange_time / dt);
+    
 
     // For train, residual is one, but this is really just the first/last time index.
     // In general, this extra work would be handled by the last rank for simplicity, but
@@ -107,11 +110,11 @@ int main(void)
         double vel = 0.0;
         int table_idx = my_rank * subrange;
         // Now sum up the values in the LUT function
-        for (long i = 0; i < (long)(subrange_time / dt); i++) {
+        for (long i = 0; i < steps_per_rank; i++) {
             double t = t_start + i * dt;
             vel += faccel(t) * dt;
 
-            if ((i + 1) % steps_per_rank == 0) {
+            if ((i + 1) % steps_per_second == 0) {
                 default_sum[table_idx] = vel;
                 table_idx++;
             }
@@ -126,12 +129,20 @@ int main(void)
         gethostname(hostname, MAX_STRING);
         MPI_Get_processor_name(nodename, &namelen);
 
+        double t_start = my_rank * subrange_time;
+        double vel = 0.0;
+        int table_idx = my_rank * subrange;
         // Now sum up the values in the LUT function
-        for(idx = 0; idx < subrange; idx++)
-        {
-            local_sum += DefaultProfile[idx];
-            default_sum[idx] = local_sum; // Each rank has it's own subset of the data
+        for (long i = 0; i < steps_per_rank; i++) {
+            double t = t_start + i * dt;
+            vel += faccel(t) * dt;
+
+            if ((i + 1) % steps_per_second == 0) {
+                default_sum[table_idx] = vel;
+                table_idx++;
+            }
         }
+        local_sum = vel;
 
         printf("Sum of DefaultProfile for rank %d of %d on %s is %lf\n", my_rank, comm_sz, nodename, local_sum);
 
@@ -200,6 +211,16 @@ int main(void)
     // Do the next round of summing from the new table, which is velocity(t) here, at same resolution
     // as the original accel(t) table with 1801 data points for time=0, ..., 1800.
     //
+
+    /**
+     * This copies the calculated velocity values from the first parallel phase
+     * to the VelProfile that's.
+     * 
+     * I could probably avoid having to do this by just having fvel()
+     * take in 
+     */
+    long unsigned int tsize = sizeof(default_sum) / sizeof(double);
+
     local_sum=0;
 
     if(my_rank != 0)
