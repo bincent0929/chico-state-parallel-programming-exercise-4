@@ -1,43 +1,43 @@
 #include "interpolation_functions.h"
 
-double table_accel(int timeidx)
+double table_accel(const int TIMEIDX)
 {
-    long unsigned int tsize = sizeof(DefaultProfile) / sizeof(double);
+    const long unsigned int TSIZE = sizeof(DefaultProfile) / sizeof(double);
 
     // Check array bounds for look-up table
-    if(timeidx > tsize)
+    if(TIMEIDX > TSIZE)
     {
-        printf("timeidx=%d exceeds table size = %lu and range %d to %lu\n", timeidx, tsize, 0, tsize-1);
+        printf("timeidx=%d exceeds table size = %lu and range %d to %lu\n", TIMEIDX, TSIZE, 0, TSIZE-1);
         exit(-1);
     }
 
-    return DefaultProfile[timeidx];
+    return DefaultProfile[TIMEIDX];
 }
 
-double table_vel(int timeidx, double VelProfile[], long unsigned int* tsize)
+double table_vel(const int TIMEIDX, const double VELPROFILE[], const long unsigned int* TSIZE)
 {
-    if(timeidx > *tsize)
+    if(TIMEIDX > *TSIZE)
     {
-        printf("timeidx=%d exceeds table size = %ld and range %d to %ld\n", timeidx, (*tsize), 0, (*tsize)-1);
+        printf("timeidx=%d exceeds table size = %ld and range %d to %ld\n", TIMEIDX, (*TSIZE), 0, (*TSIZE)-1);
         exit(-1);
     }
 
-    return VelProfile[timeidx];
+    return VELPROFILE[TIMEIDX];
 }
 
-double faccel(double time)
+double faccel(const double TIME)
 {
     // The timeidx is an index into the known acceleration profile at a time <= time of interest passed in
     //
     // Note that conversion to integer truncates double to next lowest integer value or floor(time)
     //
-    int timeidx = (int)time;
+    const int TIMEIDX = (int)TIME;
 
     // The timeidx_next is an index into the known acceleration profile at a time > time of interest passed in
     //
     // Note that the conversion to integer truncates double and the +1 is added for ceiling(time)
     //
-    int timeidx_next = ((int)time)+1;
+    const int TIMEIDX_NEXT = ((int)TIME)+1;
 
     // delta_t = time of interest - time at known value < time
     //
@@ -45,7 +45,7 @@ double faccel(double time)
     // double delta_t = (time - (double)((int)time)) / ((double)(timeidx_next - timeidx);
     //
     // If time in table is always 1 second apart, then we can simplify since (timeidx_next - timeidx) = 1.0 by definition here
-    double delta_t = time - (double)((int)time);
+    const double DELTA_T = TIME - (double)((int)TIME);
 
     return ( 
                // The accel[time] is a linear value between accel[timeidx] and accel[timeidx_next]
@@ -58,15 +58,15 @@ double faccel(double time)
                // 
                //      accel[time] = accel[timeidx] + (accel[timeidx_next] - accel[timeidx]) * delta_t
                //
-               table_accel(timeidx) + ( (table_accel(timeidx_next) - table_accel(timeidx)) * delta_t)
+               table_accel(TIMEIDX) + ( (table_accel(TIMEIDX_NEXT) - table_accel(TIMEIDX)) * DELTA_T)
            );
 }
 
-double fvel(double time, double VelProfile[], long unsigned int* tsize)
+double fvel(const double TIME, const double VELPROFILE[], const long unsigned int* TSIZE)
 {
-    int timeidx = (int)time;
-    int timeidx_next = ((int)time)+1;
-    double delta_t = time - (double)((int)time);
+    const int TIMEIDX = (int)TIME;
+    const int TIMEIDX_NEXT = ((int)TIME)+1;
+    const double DELTA_T = TIME - (double)((int)TIME);
 
-    return (table_vel(timeidx, VelProfile, tsize) + ( (table_vel(timeidx_next, VelProfile, tsize) - table_vel(timeidx, VelProfile, tsize)) * delta_t) );
+    return (table_vel(TIMEIDX, VELPROFILE, TSIZE) + ( (table_vel(TIMEIDX_NEXT, VELPROFILE, TSIZE) - table_vel(TIMEIDX, VELPROFILE, TSIZE)) * DELTA_T) );
 }
