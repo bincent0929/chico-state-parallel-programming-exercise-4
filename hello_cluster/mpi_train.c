@@ -73,7 +73,8 @@ int main(void)
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     
-    const double DT = 0.001;
+    //const double DT = 0.001;
+    const double DT = 0.0001;
     // this is the range of table values a rank processes to
     const int SUBRANGE = TABLELEN / comm_sz;
     // this is the range of times the rank processes
@@ -155,7 +156,7 @@ int main(void)
 
     // This should be the summation of DefaultProfile, which should match the spreadsheet for a train profile for DT=1.0
     MPI_Reduce(&local_sum, &g_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    if(my_rank == 0) printf("\nRank 0 g_sum = %lf\n", g_sum);
+    if(my_rank == 0) printf("\nRank 0 g_sum = %lf\n\n", g_sum);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -196,11 +197,11 @@ int main(void)
     {
 #ifdef DEBUG_TRACE
         // Now rank zero has the data from each of the other ranks in one new table
-        printf("\nVelocity TRACE: Rank %d sum of default_sum = %lf\n", my_rank, g_sum);
         for(idx = 0; idx < TABLELEN; idx+=DEBUG_STEP)
         {
             printf("Curr t=%d: a=%lf for v=%lf\n", idx, DefaultProfile[idx], default_sum[idx]);
         }
+        printf("\nVelocity TRACE: Rank %d sum of default_sum = %lf\n", my_rank, g_sum);
 #endif
     }
 
@@ -255,7 +256,7 @@ int main(void)
 
     // This should be the summation of the sums, which should match the spreadsheet for a train profile for DT=1.0
     MPI_Reduce(&local_sum, &g_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    if(my_rank == 0) printf("\nRank 0 g_sum = %lf\n", g_sum);
+    if(my_rank == 0) printf("\nRank 0 g_sum = %lf\n\n", g_sum);
 
     // DISTRIBUTE: Finally correct and overwrite all default_sum_of_sums, update all ranks with full table by sending
     // portion of table from each rank > 0 to rank=0, to fill in missing default data
@@ -293,11 +294,11 @@ int main(void)
     {
 #ifdef DEBUG_TRACE
         // Now rank zero has the data from each of the other ranks in one new table
-        printf("\nPosition TRACE: Rank %d sum of default_sum = %lf\n", my_rank, g_sum);
         for(idx = 0; idx < TABLELEN; idx+=DEBUG_STEP)
         {
             printf("Curr t=%d: a=%lf for p=%lf\n", idx, DefaultProfile[idx], default_sum_of_sums[idx]);
         }
+        printf("\nPosition TRACE: Rank %d sum of default_sum = %lf\n", my_rank, g_sum);
 #endif
     }
 
