@@ -26,7 +26,8 @@
 #include <string.h>
 #include <mpi.h>
 #include <unistd.h>
-#include <omp.h>
+// I'll add this later for a couple of the for loops
+//#include <omp.h>
 
 #include "interpolation_functions.h"
 
