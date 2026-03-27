@@ -52,38 +52,37 @@ int main(void)
 
     // Parallel summing example
     double local_sum=0.0, g_sum=0.0;
-    int tablelen = sizeof(DefaultProfile)/sizeof(double);
-    double default_sum[tablelen];
-    double default_sum_of_sums[tablelen];
-    int subrange;
+    const int TABLELEN = sizeof(DefaultProfile)/sizeof(double);
+    double default_sum[TABLELEN];
+    double default_sum_of_sums[TABLELEN];
     //int residual;
-
-    const double DT = 0.001;
 
     // Fill in default_sum array used to simulate a new table of values, such as
     // a velocity table derived by integrating acceleration
     //
-    for(idx = 0; idx < tablelen; idx++)
+    for(idx = 0; idx < TABLELEN; idx++)
     {
         default_sum[idx]=0.0;
         default_sum_of_sums[idx]=0.0;
     }
 
 
-    printf("Will divide up work for input table of size = %d\n", tablelen);
+    printf("Will divide up work for input table of size = %d\n", TABLELEN);
     MPI_Init(NULL, NULL);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     
+    const double DT = 0.001;
     // this is the range of table values a rank processes to
-    subrange = tablelen / comm_sz;
+    const int SUBRANGE = TABLELEN / comm_sz;
     // this is the range of times the rank processes
-    // tablelen - 1 == total_time
-    double subrange_time = (tablelen - 1) / comm_sz;
+    // TABLELEN - 1 == total_time
+    // different from SUBRANGE!
+    const double SUBRANGE_TIME = (TABLELEN - 1) / comm_sz;
     // this is how many steps each second is divide into
-    long steps_per_second = (long)(1.0 / DT);
+    long STEPS_PER_SECOND = (long)(1.0 / DT);
     // this is how many steps the rank will go through
-    long steps_per_rank = (long)(subrange_time / DT);
+    long STEPS_PER_RANK = (long)(SUBRANGE_TIME / DT);
     
 
     // For train, residual is one, but this is really just the first/last time index.
@@ -93,9 +92,9 @@ int main(void)
     // This should be fixed for a more general solution or checked and user guided on correct input for
     // division of work.
     //
-    //residual = tablelen % comm_sz;
+    //residual = TABLELEN % comm_sz;
 
-    printf("Went parallel: rank %d of %d doing work for %d steps\n", my_rank, comm_sz, subrange);
+    printf("Went parallel: rank %d of %d doing work for %d steps\n", my_rank, comm_sz, SUBRANGE);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // START PARALLEL PHASE 1: Sum original DefaultProfile LUT by rank
@@ -106,15 +105,15 @@ int main(void)
         gethostname(hostname, MAX_STRING);
         MPI_Get_processor_name(nodename, &namelen);
 
-        double t_start = my_rank * subrange_time;
+        double t_start = my_rank * SUBRANGE_TIME;
         double vel = 0.0;
-        int table_idx = my_rank * subrange;
+        int table_idx = my_rank * SUBRANGE;
         // Now sum up the values in the LUT function
-        for (long i = 0; i < steps_per_rank; i++) {
+        for (long i = 0; i < STEPS_PER_RANK; i++) {
             double t = t_start + i * DT;
             vel += faccel(t) * DT;
 
-            if ((i + 1) % steps_per_second == 0) {
+            if ((i + 1) % STEPS_PER_SECOND == 0) {
                 default_sum[table_idx] = vel;
                 table_idx++;
             }
@@ -129,15 +128,15 @@ int main(void)
         gethostname(hostname, MAX_STRING);
         MPI_Get_processor_name(nodename, &namelen);
 
-        double t_start = my_rank * subrange_time;
+        double t_start = my_rank * SUBRANGE_TIME;
         double vel = 0.0;
         int table_idx = 0;
         // Now sum up the values in the LUT function
-        for (long i = 0; i < steps_per_rank; i++) {
+        for (long i = 0; i < STEPS_PER_RANK; i++) {
             double t = t_start + i * DT;
             vel += faccel(t) * DT;
 
-            if ((i + 1) % steps_per_second == 0) {
+            if ((i + 1) % STEPS_PER_SECOND == 0) {
                 default_sum[table_idx] = vel;
                 table_idx++;
             }
@@ -163,13 +162,13 @@ int main(void)
     // portion of table from each rank > 0 to rank=0, to fill in missing default data
     if(my_rank != 0)
     {
-        MPI_Send(&default_sum[my_rank*subrange], subrange, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        MPI_Send(&default_sum[my_rank*SUBRANGE], SUBRANGE, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
     }
     else
     {
         for(int q=1; q < comm_sz; q++)
         {
-            MPI_Recv(&default_sum[q*subrange], subrange, MPI_DOUBLE, q, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&default_sum[q*SUBRANGE], SUBRANGE, MPI_DOUBLE, q, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
             // ADJUST FOR INITIAL CONDITION: **** SUPER IMPORTANT to adjust initial condition offset ****
             //
@@ -178,13 +177,13 @@ int main(void)
             // Good candidate for OpenMP parallel loop for MPI+OpenMP
             //
             // #pragma
-            for(idx = q*subrange; idx < (q*subrange)+subrange; idx++)
-                default_sum[idx] += default_sum[((q-1)*subrange)+subrange-1];
+            for(idx = q*SUBRANGE; idx < (q*SUBRANGE)+SUBRANGE; idx++)
+                default_sum[idx] += default_sum[((q-1)*SUBRANGE)+SUBRANGE-1];
         }
     }
     // Make sure all ranks have the full new default table - overkill, so optimize by sending just what they need
-    default_sum[tablelen-1]=default_sum[tablelen-2]; // fixes issue where last table entry is otherwise zero
-    MPI_Bcast(&default_sum[0], tablelen, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    default_sum[TABLELEN-1]=default_sum[TABLELEN-2]; // fixes issue where last table entry is otherwise zero
+    MPI_Bcast(&default_sum[0], TABLELEN, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     //
     //
     // END PARALLEL PHASE 1: Every rank has the same updated default_sum table now
@@ -197,7 +196,7 @@ int main(void)
 #ifdef DEBUG_TRACE
         // Now rank zero has the data from each of the other ranks in one new table
         printf("\nVelocity TRACE: Rank %d sum of default_sum = %lf\n", my_rank, g_sum);
-        for(idx = 0; idx < tablelen; idx+=DEBUG_STEP)
+        for(idx = 0; idx < TABLELEN; idx+=DEBUG_STEP)
         {
             printf("Curr t=%d: a=%lf for v=%lf\n", idx, DefaultProfile[idx], default_sum[idx]);
         }
@@ -212,7 +211,7 @@ int main(void)
     // as the original accel(t) table with 1801 data points for time=0, ..., 1800.
     //
 
-    // this is basically the same value of tablelen but as a
+    // this is basically the same value of TABLELEN but as a
     // different type.
     long unsigned int tsize = sizeof(default_sum) / sizeof(double);
 
@@ -221,14 +220,14 @@ int main(void)
     if(my_rank != 0)
     {
         // Now sum up the values in the new LUT function default_sum
-        double t_start = my_rank * subrange_time;
+        double t_start = my_rank * SUBRANGE_TIME;
         double dist = 0.0;
-        int table_idx = my_rank * subrange;
-        for (long i = 0; i < (long)(steps_per_rank); i++) {
+        int table_idx = my_rank * SUBRANGE;
+        for (long i = 0; i < (long)(STEPS_PER_RANK); i++) {
             double t = t_start + i * DT;
             // default_sum == VelProfile
             dist += fvel(t, default_sum, &tsize) * DT;
-            if ((i + 1) % steps_per_second == 0) {
+            if ((i + 1) % STEPS_PER_SECOND == 0) {
                 default_sum_of_sums[table_idx] = dist;
                 table_idx++;
             }
@@ -238,14 +237,14 @@ int main(void)
     else
     {
         // Now sum up the values in the new LUT function default_sum
-        double t_start = my_rank * subrange_time;
+        double t_start = my_rank * SUBRANGE_TIME;
         double dist = 0.0;
         int table_idx = 0;
-        for (long i = 0; i < (long)(steps_per_rank); i++) {
+        for (long i = 0; i < (long)(STEPS_PER_RANK); i++) {
             double t = t_start + i * DT;
             // default_sum == VelProfile
             dist += fvel(t, default_sum, &tsize) * DT;
-            if ((i + 1) % steps_per_second == 0) {
+            if ((i + 1) % STEPS_PER_SECOND == 0) {
                 default_sum_of_sums[table_idx] = dist;
                 table_idx++;
             }
@@ -261,13 +260,13 @@ int main(void)
     // portion of table from each rank > 0 to rank=0, to fill in missing default data
     if(my_rank != 0)
     {
-        MPI_Send(&default_sum_of_sums[my_rank*subrange], subrange, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        MPI_Send(&default_sum_of_sums[my_rank*SUBRANGE], SUBRANGE, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
     }
     else
     {
         for(int q=1; q < comm_sz; q++)
         {
-            MPI_Recv(&default_sum_of_sums[q*subrange], subrange, MPI_DOUBLE, q, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&default_sum_of_sums[q*SUBRANGE], SUBRANGE, MPI_DOUBLE, q, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
             // ADJUST FOR INITIAL CONDITION: **** SUPER IMPORTANT to adjust initial condition offset ****
             //
@@ -275,13 +274,13 @@ int main(void)
             //
             // Good candidate for OpenMP parallel loop for MPI+OpenMP
             //
-            for(idx = q*subrange; idx < (q*subrange)+subrange; idx++)
-                default_sum_of_sums[idx] += default_sum_of_sums[((q-1)*subrange)+subrange-1];
+            for(idx = q*SUBRANGE; idx < (q*SUBRANGE)+SUBRANGE; idx++)
+                default_sum_of_sums[idx] += default_sum_of_sums[((q-1)*SUBRANGE)+SUBRANGE-1];
         }
     }
     // Make sure all ranks have the full new default table - overkill, so optimize by sending just what they need
-    default_sum_of_sums[tablelen-1]=default_sum_of_sums[tablelen-2]; // fixes issue where last table entry is otherwise zero
-    MPI_Bcast(&default_sum_of_sums[0], tablelen, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    default_sum_of_sums[TABLELEN-1]=default_sum_of_sums[TABLELEN-2]; // fixes issue where last table entry is otherwise zero
+    MPI_Bcast(&default_sum_of_sums[0], TABLELEN, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     //
     //
     // END PHASE 2: Every rank has the same updated default_sum_of_sums table now
@@ -294,7 +293,7 @@ int main(void)
 #ifdef DEBUG_TRACE
         // Now rank zero has the data from each of the other ranks in one new table
         printf("\nPosition TRACE: Rank %d sum of default_sum = %lf\n", my_rank, g_sum);
-        for(idx = 0; idx < tablelen; idx+=DEBUG_STEP)
+        for(idx = 0; idx < TABLELEN; idx+=DEBUG_STEP)
         {
             printf("Curr t=%d: a=%lf for p=%lf\n", idx, DefaultProfile[idx], default_sum_of_sums[idx]);
         }
