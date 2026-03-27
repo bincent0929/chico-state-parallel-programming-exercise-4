@@ -81,9 +81,9 @@ int main(void)
     // different from SUBRANGE!
     const double SUBRANGE_TIME = (TABLELEN - 1) / comm_sz;
     // this is how many steps each second is divide into
-    long STEPS_PER_SECOND = (long)(1.0 / DT);
+    const long STEPS_PER_SECOND = (long)(1.0 / DT);
     // this is how many steps the rank will go through
-    long STEPS_PER_RANK = (long)(SUBRANGE_TIME / DT);
+    const long STEPS_PER_RANK = (long)(SUBRANGE_TIME / DT);
     
 
     // For train, residual is one, but this is really just the first/last time index.
@@ -106,12 +106,12 @@ int main(void)
         gethostname(hostname, MAX_STRING);
         MPI_Get_processor_name(nodename, &namelen);
 
-        double t_start = my_rank * SUBRANGE_TIME;
+        const double T_START = my_rank * SUBRANGE_TIME;
         double vel = 0.0;
         int table_idx = my_rank * SUBRANGE;
         // Now sum up the values in the LUT function
         for (long i = 0; i < STEPS_PER_RANK; i++) {
-            double t = t_start + i * DT;
+            double t = T_START + i * DT;
             vel += faccel(t) * DT;
 
             if ((i + 1) % STEPS_PER_SECOND == 0) {
@@ -129,12 +129,12 @@ int main(void)
         gethostname(hostname, MAX_STRING);
         MPI_Get_processor_name(nodename, &namelen);
 
-        double t_start = my_rank * SUBRANGE_TIME;
+        double T_START = my_rank * SUBRANGE_TIME;
         double vel = 0.0;
         int table_idx = 0;
         // Now sum up the values in the LUT function
         for (long i = 0; i < STEPS_PER_RANK; i++) {
-            double t = t_start + i * DT;
+            double t = T_START + i * DT;
             vel += faccel(t) * DT;
 
             if ((i + 1) % STEPS_PER_SECOND == 0) {
@@ -214,20 +214,20 @@ int main(void)
 
     // this is basically the same value of TABLELEN but as a
     // different type.
-    long unsigned int tsize = sizeof(default_sum) / sizeof(double);
+    const long unsigned int TSIZE = sizeof(default_sum) / sizeof(double);
 
     local_sum=0;
 
     if(my_rank != 0)
     {
         // Now sum up the values in the new LUT function default_sum
-        double t_start = my_rank * SUBRANGE_TIME;
+        const double T_START = my_rank * SUBRANGE_TIME;
         double dist = 0.0;
         int table_idx = my_rank * SUBRANGE;
         for (long i = 0; i < (long)(STEPS_PER_RANK); i++) {
-            double t = t_start + i * DT;
+            double t = T_START + i * DT;
             // default_sum == VelProfile
-            dist += fvel(t, default_sum, &tsize) * DT;
+            dist += fvel(t, default_sum, &TSIZE) * DT;
             if ((i + 1) % STEPS_PER_SECOND == 0) {
                 default_sum_of_sums[table_idx] = dist;
                 table_idx++;
@@ -238,13 +238,13 @@ int main(void)
     else
     {
         // Now sum up the values in the new LUT function default_sum
-        double t_start = my_rank * SUBRANGE_TIME;
+        const double T_START = my_rank * SUBRANGE_TIME;
         double dist = 0.0;
         int table_idx = 0;
         for (long i = 0; i < (long)(STEPS_PER_RANK); i++) {
-            double t = t_start + i * DT;
+            double t = T_START + i * DT;
             // default_sum == VelProfile
-            dist += fvel(t, default_sum, &tsize) * DT;
+            dist += fvel(t, default_sum, &TSIZE) * DT;
             if ((i + 1) % STEPS_PER_SECOND == 0) {
                 default_sum_of_sums[table_idx] = dist;
                 table_idx++;
