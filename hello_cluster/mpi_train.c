@@ -27,7 +27,7 @@
 #include <unistd.h>
 #include <omp.h>
 
-#include <interpolation_functions.h>
+#include "interpolation_functions.h"
 
 #define DEBUG_TRACE
 #define DEBUG_STEP (100)
@@ -58,8 +58,7 @@ int main(void)
     int subrange;
     //int residual;
 
-    double dt = 0.001;
-    double total_time = tablelen - 1;
+    const double DT = 0.001;
 
     // Fill in default_sum array used to simulate a new table of values, such as
     // a velocity table derived by integrating acceleration
@@ -79,11 +78,12 @@ int main(void)
     // this is the range of table values a rank processes to
     subrange = tablelen / comm_sz;
     // this is the range of times the rank processes
-    double subrange_time = total_time / comm_sz;
+    // tablelen - 1 == total_time
+    double subrange_time = (tablelen - 1) / comm_sz;
     // this is how many steps each second is divide into
-    long steps_per_second = (long)(1.0 / dt);
+    long steps_per_second = (long)(1.0 / DT);
     // this is how many steps the rank will go through
-    long steps_per_rank = (long)(subrange_time / dt);
+    long steps_per_rank = (long)(subrange_time / DT);
     
 
     // For train, residual is one, but this is really just the first/last time index.
@@ -111,8 +111,8 @@ int main(void)
         int table_idx = my_rank * subrange;
         // Now sum up the values in the LUT function
         for (long i = 0; i < steps_per_rank; i++) {
-            double t = t_start + i * dt;
-            vel += faccel(t) * dt;
+            double t = t_start + i * DT;
+            vel += faccel(t) * DT;
 
             if ((i + 1) % steps_per_second == 0) {
                 default_sum[table_idx] = vel;
@@ -131,11 +131,11 @@ int main(void)
 
         double t_start = my_rank * subrange_time;
         double vel = 0.0;
-        int table_idx = my_rank * subrange;
+        int table_idx = 0;
         // Now sum up the values in the LUT function
         for (long i = 0; i < steps_per_rank; i++) {
-            double t = t_start + i * dt;
-            vel += faccel(t) * dt;
+            double t = t_start + i * DT;
+            vel += faccel(t) * DT;
 
             if ((i + 1) % steps_per_second == 0) {
                 default_sum[table_idx] = vel;
@@ -153,7 +153,7 @@ int main(void)
         }
     }
 
-    // This should be the summation of DefaultProfile, which should match the spreadsheet for a train profile for dt=1.0
+    // This should be the summation of DefaultProfile, which should match the spreadsheet for a train profile for DT=1.0
     MPI_Reduce(&local_sum, &g_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     if(my_rank == 0) printf("\nRank 0 g_sum = %lf\n", g_sum);
 
@@ -225,9 +225,9 @@ int main(void)
         double dist = 0.0;
         int table_idx = my_rank * subrange;
         for (long i = 0; i < (long)(steps_per_rank); i++) {
-            double t = t_start + i * dt;
+            double t = t_start + i * DT;
             // default_sum == VelProfile
-            dist += fvel(t, &default_sum, &tsize) * dt;
+            dist += fvel(t, default_sum, &tsize) * DT;
             if ((i + 1) % steps_per_second == 0) {
                 default_sum_of_sums[table_idx] = dist;
                 table_idx++;
@@ -240,11 +240,11 @@ int main(void)
         // Now sum up the values in the new LUT function default_sum
         double t_start = my_rank * subrange_time;
         double dist = 0.0;
-        int table_idx = my_rank * subrange;
+        int table_idx = 0;
         for (long i = 0; i < (long)(steps_per_rank); i++) {
-            double t = t_start + i * dt;
+            double t = t_start + i * DT;
             // default_sum == VelProfile
-            dist += fvel(t, &default_sum, &tsize) * dt;
+            dist += fvel(t, default_sum, &tsize) * DT;
             if ((i + 1) % steps_per_second == 0) {
                 default_sum_of_sums[table_idx] = dist;
                 table_idx++;
@@ -253,7 +253,7 @@ int main(void)
         local_sum = dist;
     }
 
-    // This should be the summation of the sums, which should match the spreadsheet for a train profile for dt=1.0
+    // This should be the summation of the sums, which should match the spreadsheet for a train profile for DT=1.0
     MPI_Reduce(&local_sum, &g_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     if(my_rank == 0) printf("\nRank 0 g_sum = %lf\n", g_sum);
 

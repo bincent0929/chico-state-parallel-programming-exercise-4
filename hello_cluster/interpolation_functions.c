@@ -14,7 +14,7 @@ double table_accel(int timeidx)
     return DefaultProfile[timeidx];
 }
 
-double table_vel(int timeidx, double (*VelProfile[]), long unsigned int* tsize)
+double table_vel(int timeidx, double VelProfile[], long unsigned int* tsize)
 {
     if(timeidx > tsize)
     {
@@ -22,7 +22,7 @@ double table_vel(int timeidx, double (*VelProfile[]), long unsigned int* tsize)
         exit(-1);
     }
 
-    return (*VelProfile)[timeidx];
+    return VelProfile[timeidx];
 }
 
 double faccel(double time)
@@ -62,11 +62,11 @@ double faccel(double time)
            );
 }
 
-double fvel(double time, double (*VelProfile[]), long unsigned int* tsize)
+double fvel(double time, double VelProfile[], long unsigned int* tsize)
 {
     int timeidx = (int)time;
     int timeidx_next = ((int)time)+1;
     double delta_t = time - (double)((int)time);
 
-    return (table_vel(timeidx, (*VelProfile), tsize) + ( (table_vel(timeidx_next, VelProfile, tsize) - table_vel(timeidx, VelProfile, tsize)) * delta_t) );
+    return (table_vel(timeidx, VelProfile, tsize) + ( (table_vel(timeidx_next, VelProfile, tsize) - table_vel(timeidx, VelProfile, tsize)) * delta_t) );
 }
