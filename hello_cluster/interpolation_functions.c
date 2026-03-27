@@ -1,4 +1,4 @@
-#include <interpolation_functions.h>
+#include "interpolation_functions.h"
 
 double table_accel(int timeidx)
 {
@@ -16,9 +16,9 @@ double table_accel(int timeidx)
 
 double table_vel(int timeidx, double VelProfile[], long unsigned int* tsize)
 {
-    if(timeidx > tsize)
+    if(timeidx > *tsize)
     {
-        printf("timeidx=%d exceeds table size = %lu and range %d to %lu\n", timeidx, tsize, 0, tsize-1);
+        printf("timeidx=%d exceeds table size = %ld and range %d to %ld\n", timeidx, (*tsize), 0, (*tsize)-1);
         exit(-1);
     }
 

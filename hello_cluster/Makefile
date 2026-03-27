@@ -81,5 +81,5 @@ chatgpttrain:	chatgpttrain.c ex4.h
 chatgptseqtrain:	chatgptseqtrain.c ex4.h
 	$(GCC) $(CFLAGS) -o $@ chatgptseqtrain.c $(LIB_DIRS)
 
-mpi_train:	mpi_train.c trap.h sine.h
-	$(CC) $(CFLAGS) -o $@ mpi_train.c $(LIB_DIRS)
+mpi_train:	mpi_train.c interpolation_functions.c interpolation_functions.h ex4.h
+	$(CC) $(CFLAGS) -o $@ mpi_train.c interpolation_functions.c $(LIB_DIRS)

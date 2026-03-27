@@ -21,7 +21,8 @@
 // here or my github (https://github.com/sbsiewertcsu/numeric-parallel-starter-code)
 //
 
-#include <stdio.h>
+// included in "interpolation_functions.h"
+//#include <stdio.h>
 #include <string.h>
 #include <mpi.h>
 #include <unistd.h>

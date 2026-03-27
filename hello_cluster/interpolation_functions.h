@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 extern double DefaultProfile[1801];
 
 // bounds-checked lookup into DefaultProfile[]

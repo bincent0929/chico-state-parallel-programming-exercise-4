@@ -51,3 +51,4 @@ hello_cluster/ranksumbutterfly
 hello_cluster/ranksumfan
 hello_cluster/ranksumreduce
 hello_cluster/ranksumtree
+hello_cluster/mpi_train
