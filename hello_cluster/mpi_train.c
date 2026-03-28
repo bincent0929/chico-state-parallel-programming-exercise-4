@@ -75,10 +75,10 @@ int main(void)
     if (my_rank == 0)
         printf("Will divide up work for input table of size = %d\n", TABLELEN);
 
-    // I think I'll move these to defines
-    const double DT = 0.001;
-    //const double DT = 0.0001;
-    //const double DT = 0.000001;
+    
+    //const double DT = 0.001;
+    const double DT = 0.0001;
+
     // this is the range of table values a rank processes to
     const int SUBRANGE = TABLELEN / comm_sz;
     // this is the range of times the rank processes

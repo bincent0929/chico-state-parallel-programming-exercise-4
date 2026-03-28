@@ -149,3 +149,164 @@ fig.show()
 
 ## 3.
 
+### a.
+
+Refer to `mpi_train.c` to see my implementation. You can use `make` in the `hello_cluster/` directory to compile it and run it with `mpirun`.
+
+This is the output I got with running it with one process at an interpolated $dt=0.001$ seconds per step:
+```bash
+$ time mpirun -np 1 ./mpi_train
+Will divide up work for input table of size = 1801
+Went parallel: rank 0 of 1 doing work for 1801 steps
+Sum of DefaultProfile for rank 0 of 1 on LAPTOP-O8LRLROT is -0.000000
+
+Rank 0 g_sum = -0.000000
+
+Curr t=0: a=0.000000 for v=0.001451
+Curr t=100: a=0.290476 for v=14.814141
+Curr t=200: a=0.290476 for v=43.861761
+Curr t=300: a=0.290476 for v=72.907930
+Curr t=400: a=0.000000 for v=87.142860
+Curr t=500: a=0.000000 for v=87.142860
+Curr t=600: a=0.000000 for v=87.142860
+Curr t=700: a=0.000000 for v=87.142860
+Curr t=800: a=0.000000 for v=87.142860
+Curr t=900: a=0.000000 for v=87.142860
+Curr t=1000: a=0.000000 for v=87.142860
+Curr t=1100: a=0.000000 for v=87.142860
+Curr t=1200: a=0.000000 for v=87.142860
+Curr t=1300: a=0.000000 for v=87.142860
+Curr t=1400: a=0.000000 for v=87.141409
+Curr t=1500: a=-0.290476 for v=72.328719
+Curr t=1600: a=-0.290476 for v=43.281099
+Curr t=1700: a=-0.290476 for v=14.234930
+Curr t=1800: a=0.000000 for v=-0.000000
+
+Velocity TRACE: Rank 0 sum of default_sum = -0.000000
+
+Rank 0 g_sum = 122000.003272
+
+Curr t=0: a=0.000000 for p=0.003627
+Curr t=100: a=0.290476 for p=513.763949
+Curr t=200: a=0.290476 for p=3476.592142
+Curr t=300: a=0.290476 for p=9344.177983
+Curr t=400: a=0.000000 for p=17602.769852
+Curr t=500: a=0.000000 for p=26317.055852
+Curr t=600: a=0.000000 for p=35031.341852
+Curr t=700: a=0.000000 for p=43745.627852
+Curr t=800: a=0.000000 for p=52459.913853
+Curr t=900: a=0.000000 for p=61174.199853
+Curr t=1000: a=0.000000 for p=69888.485852
+Curr t=1100: a=0.000000 for p=78602.771852
+Curr t=1200: a=0.000000 for p=87317.057851
+Curr t=1300: a=0.000000 for p=96031.343850
+Curr t=1400: a=0.000000 for p=104745.625498
+Curr t=1500: a=-0.290476 for p=112946.151175
+Curr t=1600: a=-0.290476 for p=118697.608983
+Curr t=1700: a=-0.290476 for p=121544.309142
+Curr t=1800: a=0.000000 for p=122000.003272
+
+Position TRACE: Rank 0 sum of default_sum = 122000.003272
+
+real    0m0.332s
+user    0m0.061s
+sys     0m0.028s
+```
+
+### Report
+
+As you can see the final calculated position was $122000.003272$ meters and the steady state peak velocity was $87.142860$ m/s.
+
+### b.
+
+```bash
+$ time mpirun -np 1 ./mpi_train
+Will divide up work for input table of size = 1801
+Went parallel: rank 0 of 1 doing work for 1801 steps
+Sum of DefaultProfile for rank 0 of 1 on LAPTOP-O8LRLROT is -0.000000
+
+Rank 0 g_sum = -0.000000
+
+Curr t=0: a=0.000000 for v=0.001452
+Curr t=100: a=0.290476 for v=14.814272
+Curr t=200: a=0.290476 for v=43.861892
+Curr t=300: a=0.290476 for v=72.908059
+Curr t=400: a=0.000000 for v=87.142860
+Curr t=500: a=0.000000 for v=87.142860
+Curr t=600: a=0.000000 for v=87.142860
+Curr t=700: a=0.000000 for v=87.142860
+Curr t=800: a=0.000000 for v=87.142860
+Curr t=900: a=0.000000 for v=87.142860
+Curr t=1000: a=0.000000 for v=87.142860
+Curr t=1100: a=0.000000 for v=87.142860
+Curr t=1200: a=0.000000 for v=87.142860
+Curr t=1300: a=0.000000 for v=87.142860
+Curr t=1400: a=0.000000 for v=87.141408
+Curr t=1500: a=-0.290476 for v=72.328588
+Curr t=1600: a=-0.290476 for v=43.280968
+Curr t=1700: a=-0.290476 for v=14.234801
+Curr t=1800: a=0.000000 for v=-0.000000
+
+Velocity TRACE: Rank 0 sum of default_sum = -0.000000
+
+Rank 0 g_sum = 122000.003266
+
+Curr t=0: a=0.000000 for p=0.003631
+Curr t=100: a=0.290476 for p=513.777542
+Curr t=200: a=0.290476 for p=3476.631877
+Curr t=300: a=0.290476 for p=9344.243856
+Curr t=400: a=0.000000 for p=17602.848279
+Curr t=500: a=0.000000 for p=26317.134278
+Curr t=600: a=0.000000 for p=35031.420278
+Curr t=700: a=0.000000 for p=43745.706277
+Curr t=800: a=0.000000 for p=52459.992276
+Curr t=900: a=0.000000 for p=61174.278276
+Curr t=1000: a=0.000000 for p=69888.564275
+Curr t=1100: a=0.000000 for p=78602.850274
+Curr t=1200: a=0.000000 for p=87317.136273
+Curr t=1300: a=0.000000 for p=96031.422273
+Curr t=1400: a=0.000000 for p=104745.703916
+Curr t=1500: a=-0.290476 for p=112946.216004
+Curr t=1600: a=-0.290476 for p=118697.647668
+Curr t=1700: a=-0.290476 for p=121544.321689
+Curr t=1800: a=0.000000 for p=122000.003266
+
+Position TRACE: Rank 0 sum of default_sum = 122000.003266
+
+real    0m0.612s
+user    0m0.268s
+sys     0m0.051s
+```
+
+### Report
+
+The final calculated position was $122000.003266$ meters and the steady state peak velocity was $87.142860$ m/s.
+
+### Comparison
+
+#### Value Comparison
+
+``` {python}
+larger_step_distance = 122000.003272
+smaller_step_distance = 122000.003266
+
+compare_step_size_distance = 1 + (122000.003272 / 122000.003266)
+```
+
+When compared, the larger step size's distance was `{python} compare_step_size_distance`x larger than the smaller step size's.
+
+For the steady state peak velocity values, they came amount to be the same at $87.142860$.
+
+#### Run Time comparison
+
+``` {python}
+larger_step_runtime = 0.332
+smaller_step_runtime = 0.612
+
+compare_step_size_time = smaller_runtime / larger_runtime
+```
+
+The runtime for $dt=0.001$ was `{python} larger_runtime` and the runtime for $dt=0.0001$ was `{python} smaller_runtime`.
+
+The runtime for $dt=0.0001$ was `{python} compare_step_size_time`x longer than $dt=0.001$.
+

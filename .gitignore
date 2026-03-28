@@ -1,4 +1,6 @@
 .venv/
+*.quarto_ipynb_*
+# Compiled files
 hello_cuda/cuda_hello
 hello_cuda/cuda_hello.o
 hello_cuda/cuda_hello1
@@ -28,10 +30,6 @@ functiongen/timeprofiles_omp
 functiongen/timeprofiles.o
 functiongen/interop-output-10ps.csv
 exercise4.html
-exercise4.quarto_ipynb_1
-exercise4.quarto_ipynb_2
-exercise4.quarto_ipynb_3
-*.ipynb
 hello_cluster/chatgptseqtrain
 hello_cluster/chatgpttrain
 hello_cluster/compare
