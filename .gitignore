@@ -1,5 +1,6 @@
 .venv/
 *.quarto_ipynb_*
+exercise4_files/
 # Compiled files
 hello_cuda/cuda_hello
 hello_cuda/cuda_hello.o
