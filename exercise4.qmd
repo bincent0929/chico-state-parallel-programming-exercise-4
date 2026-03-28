@@ -213,7 +213,7 @@ user    0m0.061s
 sys     0m0.028s
 ```
 
-### Report
+#### Report
 
 As you can see the final calculated position was $122000.003272$ meters and the steady state peak velocity was $87.142860$ m/s.
 
@@ -278,13 +278,13 @@ user    0m0.268s
 sys     0m0.051s
 ```
 
-### Report
+#### Report
 
 The final calculated position was $122000.003266$ meters and the steady state peak velocity was $87.142860$ m/s.
 
-### Comparison
+#### Comparison
 
-#### Value Comparison
+##### Value Comparison
 
 ``` {python}
 larger_step_distance = 122000.003272
@@ -297,7 +297,7 @@ When compared, the larger step size's distance was `{python} compare_step_size_d
 
 For the steady state peak velocity values, they came amount to be the same at $87.142860$.
 
-#### Run Time comparison
+##### Run Time comparison
 
 ``` {python}
 larger_step_runtime = 0.332
@@ -309,4 +309,320 @@ compare_step_size_time = smaller_runtime / larger_runtime
 The runtime for $dt=0.001$ was `{python} larger_runtime` and the runtime for $dt=0.0001$ was `{python} smaller_runtime`.
 
 The runtime for $dt=0.0001$ was `{python} compare_step_size_time`x longer than $dt=0.001$.
+
+### c.
+
+#### 2 Proccesses
+
+```bash
+$ time mpirun -np 2 ./mpi_train
+Will divide up work for input table of size = 1801
+Went parallel: rank 0 of 2 doing work for 900 steps
+Went parallel: rank 1 of 2 doing work for 900 steps
+Sum of DefaultProfile for rank 0 of 2 on LAPTOP-O8LRLROT is 87.142860
+Sum of DefaultProfile for rank 1 of 2 on LAPTOP-O8LRLROT is -87.142860
+
+Rank 0 g_sum = -0.000000
+
+Curr t=0: a=0.000000 for v=0.001452
+Curr t=100: a=0.290476 for v=14.814272
+Curr t=200: a=0.290476 for v=43.861892
+Curr t=300: a=0.290476 for v=72.908059
+Curr t=400: a=0.000000 for v=87.142860
+Curr t=500: a=0.000000 for v=87.142860
+Curr t=600: a=0.000000 for v=87.142860
+Curr t=700: a=0.000000 for v=87.142860
+Curr t=800: a=0.000000 for v=87.142860
+Curr t=900: a=0.000000 for v=87.142860
+Curr t=1000: a=0.000000 for v=87.142860
+Curr t=1100: a=0.000000 for v=87.142860
+Curr t=1200: a=0.000000 for v=87.142860
+Curr t=1300: a=0.000000 for v=87.142860
+Curr t=1400: a=0.000000 for v=87.141408
+Curr t=1500: a=-0.290476 for v=72.328588
+Curr t=1600: a=-0.290476 for v=43.280968
+Curr t=1700: a=-0.290476 for v=14.234801
+Curr t=1800: a=0.000000 for v=-0.000000
+
+Velocity TRACE: Rank 0 sum of default_sum = -0.000000
+
+Rank 0 g_sum = 122000.003266
+
+Curr t=0: a=0.000000 for p=0.003631
+Curr t=100: a=0.290476 for p=513.777542
+Curr t=200: a=0.290476 for p=3476.631877
+Curr t=300: a=0.290476 for p=9344.243856
+Curr t=400: a=0.000000 for p=17602.848279
+Curr t=500: a=0.000000 for p=26317.134278
+Curr t=600: a=0.000000 for p=35031.420278
+Curr t=700: a=0.000000 for p=43745.706277
+Curr t=800: a=0.000000 for p=52459.992276
+Curr t=900: a=0.000000 for p=61174.278276
+Curr t=1000: a=0.000000 for p=69888.564275
+Curr t=1100: a=0.000000 for p=78602.850274
+Curr t=1200: a=0.000000 for p=87317.136274
+Curr t=1300: a=0.000000 for p=96031.422273
+Curr t=1400: a=0.000000 for p=104745.703916
+Curr t=1500: a=-0.290476 for p=112946.216004
+Curr t=1600: a=-0.290476 for p=118697.647668
+Curr t=1700: a=-0.290476 for p=121544.321690
+Curr t=1800: a=0.000000 for p=122000.003266
+
+Position TRACE: Rank 0 sum of default_sum = 122000.003266
+
+real    0m0.434s
+user    0m0.321s
+sys     0m0.027s
+```
+
+```{python}
+two_proc_completion_time = 0.434
+```
+
+#### 4 Proccesses
+
+```bash
+$ time mpirun -np 4 ./mpi_train
+Went parallel: rank 2 of 4 doing work for 450 steps
+Went parallel: rank 3 of 4 doing work for 450 steps
+Will divide up work for input table of size = 1801
+Went parallel: rank 0 of 4 doing work for 450 steps
+Went parallel: rank 1 of 4 doing work for 450 steps
+Sum of DefaultProfile for rank 0 of 4 on LAPTOP-O8LRLROT is 87.142860
+Sum of DefaultProfile for rank 1 of 4 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 2 of 4 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 3 of 4 on LAPTOP-O8LRLROT is -87.142860
+
+Rank 0 g_sum = -0.000000
+
+Curr t=0: a=0.000000 for v=0.001452
+Curr t=100: a=0.290476 for v=14.814272
+Curr t=200: a=0.290476 for v=43.861892
+Curr t=300: a=0.290476 for v=72.908059
+Curr t=400: a=0.000000 for v=87.142860
+Curr t=500: a=0.000000 for v=87.142860
+Curr t=600: a=0.000000 for v=87.142860
+Curr t=700: a=0.000000 for v=87.142860
+Curr t=800: a=0.000000 for v=87.142860
+Curr t=900: a=0.000000 for v=87.142860
+Curr t=1000: a=0.000000 for v=87.142860
+Curr t=1100: a=0.000000 for v=87.142860
+Curr t=1200: a=0.000000 for v=87.142860
+Curr t=1300: a=0.000000 for v=87.142860
+Curr t=1400: a=0.000000 for v=87.141408
+Curr t=1500: a=-0.290476 for v=72.328588
+Curr t=1600: a=-0.290476 for v=43.280968
+Curr t=1700: a=-0.290476 for v=14.234801
+Curr t=1800: a=0.000000 for v=-0.000000
+
+Velocity TRACE: Rank 0 sum of default_sum = -0.000000
+
+Rank 0 g_sum = 122000.003266
+
+Curr t=0: a=0.000000 for p=0.003631
+Curr t=100: a=0.290476 for p=513.777542
+Curr t=200: a=0.290476 for p=3476.631877
+Curr t=300: a=0.290476 for p=9344.243856
+Curr t=400: a=0.000000 for p=17602.848279
+Curr t=500: a=0.000000 for p=26317.134279
+Curr t=600: a=0.000000 for p=35031.420278
+Curr t=700: a=0.000000 for p=43745.706277
+Curr t=800: a=0.000000 for p=52459.992276
+Curr t=900: a=0.000000 for p=61174.278276
+Curr t=1000: a=0.000000 for p=69888.564275
+Curr t=1100: a=0.000000 for p=78602.850275
+Curr t=1200: a=0.000000 for p=87317.136274
+Curr t=1300: a=0.000000 for p=96031.422273
+Curr t=1400: a=0.000000 for p=104745.703916
+Curr t=1500: a=-0.290476 for p=112946.216004
+Curr t=1600: a=-0.290476 for p=118697.647669
+Curr t=1700: a=-0.290476 for p=121544.321690
+Curr t=1800: a=0.000000 for p=122000.003266
+
+Position TRACE: Rank 0 sum of default_sum = 122000.003266
+
+real    0m0.386s
+user    0m0.329s
+sys     0m0.066s
+```
+
+```{python}
+four_proc_completion_time = 0.386
+```
+
+#### 8 Proccesses
+
+```bash
+$ time mpirun -np 8 ./mpi_train
+Went parallel: rank 6 of 8 doing work for 225 steps
+Went parallel: rank 7 of 8 doing work for 225 steps
+Will divide up work for input table of size = 1801
+Went parallel: rank 0 of 8 doing work for 225 steps
+Went parallel: rank 1 of 8 doing work for 225 steps
+Went parallel: rank 2 of 8 doing work for 225 steps
+Went parallel: rank 3 of 8 doing work for 225 steps
+Went parallel: rank 4 of 8 doing work for 225 steps
+Went parallel: rank 5 of 8 doing work for 225 steps
+Sum of DefaultProfile for rank 0 of 8 on LAPTOP-O8LRLROT is 50.833320
+Sum of DefaultProfile for rank 1 of 8 on LAPTOP-O8LRLROT is 36.309540
+Sum of DefaultProfile for rank 2 of 8 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 3 of 8 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 4 of 8 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 5 of 8 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 6 of 8 on LAPTOP-O8LRLROT is -36.309510
+Sum of DefaultProfile for rank 7 of 8 on LAPTOP-O8LRLROT is -50.833350
+
+Rank 0 g_sum = -0.000000
+
+Curr t=0: a=0.000000 for v=0.001452
+Curr t=100: a=0.290476 for v=14.814272
+Curr t=200: a=0.290476 for v=43.861892
+Curr t=300: a=0.290476 for v=72.908059
+Curr t=400: a=0.000000 for v=87.142860
+Curr t=500: a=0.000000 for v=87.142860
+Curr t=600: a=0.000000 for v=87.142860
+Curr t=700: a=0.000000 for v=87.142860
+Curr t=800: a=0.000000 for v=87.142860
+Curr t=900: a=0.000000 for v=87.142860
+Curr t=1000: a=0.000000 for v=87.142860
+Curr t=1100: a=0.000000 for v=87.142860
+Curr t=1200: a=0.000000 for v=87.142860
+Curr t=1300: a=0.000000 for v=87.142860
+Curr t=1400: a=0.000000 for v=87.141408
+Curr t=1500: a=-0.290476 for v=72.328588
+Curr t=1600: a=-0.290476 for v=43.280968
+Curr t=1700: a=-0.290476 for v=14.234801
+Curr t=1800: a=0.000000 for v=-0.000000
+
+Velocity TRACE: Rank 0 sum of default_sum = -0.000000
+
+Rank 0 g_sum = 122000.003269
+
+Curr t=0: a=0.000000 for p=0.003631
+Curr t=100: a=0.290476 for p=513.777542
+Curr t=200: a=0.290476 for p=3476.631877
+Curr t=300: a=0.290476 for p=9344.243856
+Curr t=400: a=0.000000 for p=17602.848279
+Curr t=500: a=0.000000 for p=26317.134279
+Curr t=600: a=0.000000 for p=35031.420278
+Curr t=700: a=0.000000 for p=43745.706278
+Curr t=800: a=0.000000 for p=52459.992278
+Curr t=900: a=0.000000 for p=61174.278277
+Curr t=1000: a=0.000000 for p=69888.564277
+Curr t=1100: a=0.000000 for p=78602.850276
+Curr t=1200: a=0.000000 for p=87317.136276
+Curr t=1300: a=0.000000 for p=96031.422275
+Curr t=1400: a=0.000000 for p=104745.703918
+Curr t=1500: a=-0.290476 for p=112946.216007
+Curr t=1600: a=-0.290476 for p=118697.647671
+Curr t=1700: a=-0.290476 for p=121544.321692
+Curr t=1800: a=0.000000 for p=122000.003269
+
+Position TRACE: Rank 0 sum of default_sum = 122000.003269
+
+real    0m0.375s
+user    0m0.588s
+sys     0m0.157s
+```
+
+```{python}
+eight_proc_completion_time = 0.375
+```
+
+#### 16 Proccesses
+
+```bash
+$ time mpirun -np 16 --use-hwthread-cpus ./mpi_train
+Went parallel: rank 8 of 16 doing work for 112 steps
+Went parallel: rank 10 of 16 doing work for 112 steps
+Went parallel: rank 12 of 16 doing work for 112 steps
+Went parallel: rank 15 of 16 doing work for 112 steps
+Went parallel: rank 5 of 16 doing work for 112 steps
+Went parallel: rank 7 of 16 doing work for 112 steps
+Went parallel: rank 1 of 16 doing work for 112 steps
+Went parallel: rank 2 of 16 doing work for 112 steps
+Went parallel: rank 9 of 16 doing work for 112 steps
+Went parallel: rank 11 of 16 doing work for 112 steps
+Went parallel: rank 13 of 16 doing work for 112 steps
+Went parallel: rank 14 of 16 doing work for 112 steps
+Will divide up work for input table of size = 1801
+Went parallel: rank 0 of 16 doing work for 112 steps
+Went parallel: rank 4 of 16 doing work for 112 steps
+Went parallel: rank 3 of 16 doing work for 112 steps
+Went parallel: rank 6 of 16 doing work for 112 steps
+Sum of DefaultProfile for rank 0 of 16 on LAPTOP-O8LRLROT is 18.009510
+Sum of DefaultProfile for rank 1 of 16 on LAPTOP-O8LRLROT is 32.533334
+Sum of DefaultProfile for rank 2 of 16 on LAPTOP-O8LRLROT is 30.651054
+Sum of DefaultProfile for rank 3 of 16 on LAPTOP-O8LRLROT is 5.948962
+Sum of DefaultProfile for rank 4 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 5 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 6 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 7 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 8 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 9 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 10 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 11 of 16 on LAPTOP-O8LRLROT is 0.000000
+Sum of DefaultProfile for rank 12 of 16 on LAPTOP-O8LRLROT is -4.554659
+Sum of DefaultProfile for rank 13 of 16 on LAPTOP-O8LRLROT is -29.721518
+Sum of DefaultProfile for rank 14 of 16 on LAPTOP-O8LRLROT is -32.533334
+Sum of DefaultProfile for rank 15 of 16 on LAPTOP-O8LRLROT is -20.240395
+
+Rank 0 g_sum = 0.092954
+
+Curr t=0: a=0.000000 for v=0.001452
+Curr t=100: a=0.290476 for v=14.814272
+Curr t=200: a=0.290476 for v=43.861892
+Curr t=300: a=0.290476 for v=72.908059
+Curr t=400: a=0.000000 for v=87.142860
+Curr t=500: a=0.000000 for v=87.142860
+Curr t=600: a=0.000000 for v=87.142860
+Curr t=700: a=0.000000 for v=87.142860
+Curr t=800: a=0.000000 for v=87.142860
+Curr t=900: a=0.000000 for v=87.142860
+Curr t=1000: a=0.000000 for v=87.142860
+Curr t=1100: a=0.000000 for v=87.142860
+Curr t=1200: a=0.000000 for v=87.142860
+Curr t=1300: a=0.000000 for v=87.142860
+Curr t=1400: a=0.000000 for v=87.141408
+Curr t=1500: a=-0.290476 for v=72.328588
+Curr t=1600: a=-0.290476 for v=43.280968
+Curr t=1700: a=-0.290476 for v=14.234801
+Curr t=1800: a=0.000000 for v=0.000000
+
+Velocity TRACE: Rank 0 sum of default_sum = 0.092954
+
+Rank 0 g_sum = 121999.799937
+
+Curr t=0: a=0.000000 for p=0.003631
+Curr t=100: a=0.290476 for p=513.777542
+Curr t=200: a=0.290476 for p=3476.631877
+Curr t=300: a=0.290476 for p=9344.243856
+Curr t=400: a=0.000000 for p=17602.848280
+Curr t=500: a=0.000000 for p=26317.134280
+Curr t=600: a=0.000000 for p=35031.420280
+Curr t=700: a=0.000000 for p=43745.706280
+Curr t=800: a=0.000000 for p=52459.992280
+Curr t=900: a=0.000000 for p=61174.278280
+Curr t=1000: a=0.000000 for p=69888.564280
+Curr t=1100: a=0.000000 for p=78602.850280
+Curr t=1200: a=0.000000 for p=87317.136280
+Curr t=1300: a=0.000000 for p=96031.422280
+Curr t=1400: a=0.000000 for p=104745.703923
+Curr t=1500: a=-0.290476 for p=112946.216012
+Curr t=1600: a=-0.290476 for p=118697.647676
+Curr t=1700: a=-0.290476 for p=121544.321698
+Curr t=1800: a=0.000000 for p=0.000000
+
+Position TRACE: Rank 0 sum of default_sum = 121999.799937
+
+real    0m0.362s
+user    0m0.796s
+sys     0m0.290s
+```
+
+```{python}
+sixteen_proc_completion_time = 0.362
+```
+
+In this instance, `--use-hwthread-cpus` allows me to segment the CPU as hardware threads instead of cores. Which enables me to utilize each thread as if it where its own core.
 
