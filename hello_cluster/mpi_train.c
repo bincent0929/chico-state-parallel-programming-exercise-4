@@ -26,7 +26,7 @@
 #include <string.h>
 #include <mpi.h>
 #include <unistd.h>
-// I'll add this later for a couple of the for loops
+// maybe I'll add this later for a couple of the for loops
 //#include <omp.h>
 
 #include "interpolation_functions.h"
@@ -68,14 +68,17 @@ int main(void)
         default_sum_of_sums[idx]=0.0;
     }
 
-
-    printf("Will divide up work for input table of size = %d\n", TABLELEN);
     MPI_Init(NULL, NULL);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     
-    //const double DT = 0.001;
-    const double DT = 0.0001;
+    if (my_rank == 0)
+        printf("Will divide up work for input table of size = %d\n", TABLELEN);
+
+    // I think I'll move these to defines
+    const double DT = 0.001;
+    //const double DT = 0.0001;
+    //const double DT = 0.000001;
     // this is the range of table values a rank processes to
     const int SUBRANGE = TABLELEN / comm_sz;
     // this is the range of times the rank processes
