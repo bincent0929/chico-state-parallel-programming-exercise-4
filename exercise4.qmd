@@ -195,6 +195,8 @@ fig.update_layout(
 fig.show()
 ```
 
+Zoom into the graph and you will be able to see how much finer the smaller step sized interpolation is than the larger step size.
+
 ## 3.
 
 ### a.
